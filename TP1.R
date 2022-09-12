@@ -112,12 +112,6 @@ df$occu_perc <-ifelse(df$occu_perc>1, df$occu_perc-1, df$occu_perc)
 #paso capacity a positivo
 df$capacity<-as.integer(ifelse(df$capacity<0, df$capacity*(-1), df$capacity))
 
-#creo var occu real
-df$occu_real <- (df$ticket_use/df$capacity)
-
-#elimino occu_real > 1, no tendría sentido y no aporta al análisis. 
-df$occu_real <-ifelse(df$occu_real>1, df$occu_real-1, df$occu_real)
-
 #creo var success 
 df$success <- ifelse(df$occu_perc>0.2, "YES", "NO")
 
@@ -188,7 +182,6 @@ GGally::ggcorr(
   label=T, hjust=1, label_size=2, layout.exp=10, size=3)
 
 ----
-  
 
 #cantidad de transacciones por dia de la semana
 table(df_cat$weekday)
@@ -223,17 +216,16 @@ testeo=dr[dr$date>"2018-09-03",]
  -----
 
 arbol <- rpart(
-    formula = tickets_sold ~ capacity, ticket_price, # Ecuación var dependiente vs. independientes
+    formula = tickets_sold ~ capacity, ticket_price, 
     data    = entreno, # Dataset
     method  = "anova" # Anova para especificar que es un arbol de regresión
   )
 
 rpart.plot(arbol,extra=1,type=5)
 
-#prueba sobre el arbol de decision
+#prueba sobre ek arbol de decision
 pred=predict(arbol,testeo, type="vector") 
-
-confusionMatrix(pred,entreno$tickets_sold) #chequear
+confusionMatrix(pred,testeo$tickets_sold)
 
 
 
